@@ -142,7 +142,7 @@ Exit and Save Results:
             return image
         return image[
             self.region[1] : self.region[3], self.region[0] : self.region[2]
-        ].copy()
+        ]
 
     def _encode_boxes(self, boxes):
         """
@@ -252,13 +252,7 @@ Exit and Save Results:
 
             self.classes[sort_index] = self.cur_class
 
-    def box_fix(self, xyxy):
-        x_center = float(xyxy[0] + xyxy[2]) / 2
-        y_center = float(xyxy[1] + xyxy[3]) / 2
-        width = abs(xyxy[2] - xyxy[0])
-        height = abs(xyxy[3] - xyxy[1])
-        xywh_center = [x_center, y_center, width, height]
-        return xywh_center
+
 
     def _draw_roi(self, event, x, y, flags, param, mode=True):
         x, y = self._decode_point((x, y))
@@ -417,15 +411,7 @@ Exit and Save Results:
         
         return image
 
-    def xywh2xyxy(self, xywh):
-        """[x, y, w, h]转为[xmin, ymin, xmax, ymax]"""
-        xmin = xywh[0] - xywh[2] / 2
-        ymin = xywh[1] - xywh[3] / 2
-        xmax = xywh[0] + xywh[2] / 2
-        ymax = xywh[1] + xywh[3] / 2
-        xyxy = [xmin, ymin, xmax, ymax]
 
-        return xyxy
 
     def read_label_file(self, label_file_path):
 
@@ -436,7 +422,7 @@ Exit and Save Results:
         print(annotation)
         for bbox in annotation:
             bbox = list(map(float, bbox.split()))
-            boxes.append(self.xywh2xyxy(bbox[1:]))
+            boxes.append(xywh2xyxy(bbox[1:]))
             classes.append(bbox[0])
 
         self.boxes = boxes
@@ -446,7 +432,7 @@ Exit and Save Results:
     def write_label_file(self, label_file_path):
         ann_boxes = []
         for box, cls in zip(self.boxes, self.classes):
-            box = list(map(str, self.box_fix(box)))
+            box = list(map(str, box_fix(box)))
             box.insert(0, str(int(cls)))
             ann_boxes.append(" ".join(box))
 

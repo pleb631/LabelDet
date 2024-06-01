@@ -161,3 +161,24 @@ def statistics_box_num(image_list):
         f"\nTotal Num: {len(image_list)}\nBox Num: {box_num}\nUnvisted Img Num: {unlabel_num}\nLabeled Img Num: {has_labeled}\nUnlabeled Img Num: {nolabel}\n"
     )
     return box_num
+
+
+
+def xywh2xyxy(xywh):
+    """[x, y, w, h]转为[xmin, ymin, xmax, ymax]"""
+    xmin = xywh[0] - xywh[2] / 2
+    ymin = xywh[1] - xywh[3] / 2
+    xmax = xywh[0] + xywh[2] / 2
+    ymax = xywh[1] + xywh[3] / 2
+    xyxy = [xmin, ymin, xmax, ymax]
+
+    return xyxy
+
+
+def box_fix(xyxy):
+    x_center = float(xyxy[0] + xyxy[2]) / 2
+    y_center = float(xyxy[1] + xyxy[3]) / 2
+    width = abs(xyxy[2] - xyxy[0])
+    height = abs(xyxy[3] - xyxy[1])
+    xywh_center = [x_center, y_center, width, height]
+    return xywh_center
