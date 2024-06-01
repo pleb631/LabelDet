@@ -4,7 +4,7 @@
 
 该工具旨在提供一种简单高效的图像标注解决方案，适用于 YOLO 格式的目标检测任务。
 
-![演示](./data/zidane.png)
+![演示](./data/zidane.jpg)
 只需使用 `opencv` 包，即可轻松分发，方便 PyInstaller 打包和分发。
 
 ## 简介

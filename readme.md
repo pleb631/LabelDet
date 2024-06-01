@@ -4,7 +4,7 @@
 
 This tool aims to provide a simple and efficient image annotation solution, suitable for YOLO format object detection tasks.
 
-![demo](./data/zidane.png)
+![demo](./data/zidane.jpg)
 
 It is easy to distribute with only `opencv` package , making it convenient for PyInstaller packaging and distribution.
 
