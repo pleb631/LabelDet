@@ -53,7 +53,7 @@ def plt_bbox(
     tl = line_thickness or round(
         0.001 * (img.shape[0] + img.shape[1]) / 2
     )  # line/font thickness
-    tl = max(2, tl)
+    tl = max(1, tl)
     p1, p2 = (int(box[0]), int(box[1])), (int(box[2]), int(box[3]))
     cv2.rectangle(img, p1, p2, box_color, tl)
     if label_format:
@@ -90,6 +90,12 @@ def compute_color_for_labels(label):
         [0, 255, 255],
         [128, 255, 0],
         [255, 128, 0],
+        [255, 178, 102],
+        [255, 153, 255],
+        [255, 102, 255],
+        [102, 178, 255],
+        [255, 153, 153],
+        [255, 51, 51],
     ]
     return color[label % len(color)]
 

@@ -17,6 +17,7 @@ class config_window:
     def show(self,main_window):
         cv2.namedWindow(main_window.config_name, cv2.WINDOW_NORMAL)
         cv2.createTrackbar("mode", main_window.config_name, main_window.vis_mode, 10, main_window.set_mode)
+        cv2.createTrackbar("thickness", main_window.config_name, main_window.thickness, 5, main_window.set_thickness)
         
         
 class CLabeled:
@@ -130,6 +131,7 @@ Exit and Save Results:
         self.drawing = False
 
         self.vis_mode = 0
+        self.thickness = 1
         self.mouse_event=None
 
     def _encode_image(self, image):
@@ -287,7 +289,6 @@ Exit and Save Results:
             x2 = min(x1 + new_width, win_width)
             y2 = min(y1 + new_height, win_height)
             self.region = [x1,y1,x2,y2]
-            x1,y1,x2,y2 = self.region
  
             if self.region==[0, 0, win_width, win_height]:
                 self.region=None
@@ -308,25 +309,18 @@ Exit and Save Results:
                 if abs(offset_x) > 3 and abs(offset_y) > 3:
                     new_width = self.region[2] - self.region[0]
                     new_height = self.region[3] - self.region[1]
-                    self.region = [
+                    region = [
                         self.region[0] - offset_x,
                         self.region[1] - offset_y,
                         self.region[2] - offset_x,
                         self.region[3] - offset_y,
                     ]
-                    # 保持region大小同时保持region在原图中
-                    if self.region[0] < 0:
-                        self.region[0] = 0
-                        self.region[2] = new_width
-                    if self.region[1] < 0:
-                        self.region[1] = 0
-                        self.region[3] = new_height
-                    if self.region[2] > win_width:
-                        self.region[2] = win_width
-                        self.region[0] = max(0, win_width - new_width)
-                    if self.region[3] > win_height:
-                        self.region[3] = win_height
-                        self.region[1] = max(0, win_height - new_height)
+                    x1,y1,x2,y2 = region
+                    x1 = max(x1,0)
+                    y1 = max(y1,0)
+                    x2 = min(x1 + new_width, win_width)
+                    y2 = min(y1 + new_height, win_height)
+                    self.region = [x1,y1,x2,y2]
             
         elif event == cv2.EVENT_LBUTTONDBLCLK:
             self.change_box_category()
@@ -361,7 +355,7 @@ Exit and Save Results:
             x2, y2 = (int(new_unpad[0] * box[2]+dw), int(new_unpad[1] * box[3]+dh))
             color = compute_color_for_labels(int(cls))
             box = [x1, y1, x2, y2, int(cls)]
-            image = plt_bbox(image, box, box_color=color)
+            image = plt_bbox(image, box, self.thickness,box_color=color)
         
         return image
 
@@ -404,6 +398,11 @@ Exit and Save Results:
             self.current_label_index = int(line.strip())
         checkpoint_file.close()
 
+    
+    def set_thickness(self,value):
+        self.thickness = max(value, 1)
+        
+        
     def set_mode(self, value):
         if self.image is not None:
             image = self.image.copy()
@@ -483,7 +482,7 @@ Exit and Save Results:
                 if flags == cv2.EVENT_FLAG_LBUTTON:
                     # 按住鼠标左键进行移动，画框
                     color = compute_color_for_labels(self.cur_class)
-                    cv2.rectangle(image, (self.ix, self.iy), (x, y), color, 2)
+                    cv2.rectangle(image, (self.ix, self.iy), (x, y), color, self.thickness)
                 
                 elif event == cv2.EVENT_MOUSEMOVE:
                     cv2.line(
@@ -491,10 +490,10 @@ Exit and Save Results:
                         (x, top),
                         (x, win_height-bottom),
                         (255, 0, 0),
-                        2,
+                        self.thickness,
                         8,
                     )
-                    cv2.line(image, (left, y), (win_width-right, y), (255, 0, 0), 2, 8)
+                    cv2.line(image, (left, y), (win_width-right, y), (255, 0, 0), self.thickness, 8)
              
             
                     
@@ -613,7 +612,7 @@ def main():
     if not os.path.exists(image_folder):
         raise ValueError(f"{colorstr('red', 'bold', 'ValueError:')} {image_folder} does not exists! please check it !")
 
-    category_num = 4
+    category_num = 14
     args = easydict.EasyDict(
         {
             "image_folder": image_folder,
