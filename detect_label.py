@@ -440,8 +440,13 @@ Exit and Save Results:
 
         return image
 
-    def getScaleInfo(self,):
+    def getScaleInfo(self,only_check_winsize=False):
+        
         *_, win_width, win_height = cv2.getWindowImageRect(self.windows_name)
+        if only_check_winsize and not self.win_info is None:
+            if self.win_info[:2]==(win_width, win_height):
+                return 0
+            
         ori_h,ori_w,_=self.image.shape
         r  = min(win_width/ori_w, win_height/ori_h)
         if r>1:
@@ -457,6 +462,8 @@ Exit and Save Results:
         left, right = int(round(dw - 0.1)), int(round(dw + 0.1))
         
         self.win_info = (win_width, win_height,left,top,right,bottom,new_unpad,interpolation)
+        
+        return 0
         
         
     def render(self):
@@ -536,6 +543,7 @@ Exit and Save Results:
                     np.fromfile(image_path, dtype=np.uint8),
                     1,
                 )
+                self.getScaleInfo(only_check_winsize=False)
                 if self.vis_mode > 0:
                     self.set_mode(self.vis_mode)
 
@@ -546,7 +554,7 @@ Exit and Save Results:
                     f"Img ID: {labeled_index}\nImg Path: {image_path}\nLabel Path: {self.label_path}\n"
                 )
 
-            self.getScaleInfo()
+            self.getScaleInfo(only_check_winsize=True)
             cv2.setMouseCallback(self.windows_name, self._draw_roi)
             self.render()
             key = cv2.waitKey(1)
