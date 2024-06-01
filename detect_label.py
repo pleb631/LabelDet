@@ -18,7 +18,7 @@ class config_window:
         cv2.namedWindow(main_window.config_name, cv2.WINDOW_NORMAL)
         cv2.createTrackbar("mode", main_window.config_name, main_window.vis_mode, 10, main_window.set_mode)
         cv2.createTrackbar("thickness", main_window.config_name, main_window.thickness, 5, main_window.set_thickness)
-        
+        cv2.createTrackbar("scale", main_window.config_name, main_window.imgscale_mode, 1, main_window.set_imgscale_mode)
         
 class CLabeled:
     img_format = [".jpg", ".png", ".webp",".bmp",".jpeg"]
@@ -131,7 +131,8 @@ Exit and Save Results:
         self.drawing = False
 
         self.vis_mode = 0
-        self.thickness = 1
+        self.thickness = 2
+        self.imgscale_mode = 0
         self.mouse_event=None
 
     def _encode_image(self, image):
@@ -402,6 +403,10 @@ Exit and Save Results:
     def set_thickness(self,value):
         self.thickness = max(value, 1)
         
+    def set_imgscale_mode(self,value):
+        self.imgscale_mode = value
+        self.getScaleInfo(False)
+        
         
     def set_mode(self, value):
         if self.image is not None:
@@ -448,6 +453,9 @@ Exit and Save Results:
             
         ori_h,ori_w,_=self.image.shape
         r  = min(win_width/ori_w, win_height/ori_h)
+        if r>1 and self.imgscale_mode!=0:
+            r=1
+            
         if r>1:
             interpolation=cv2.INTER_CUBIC
         else:
@@ -542,7 +550,7 @@ Exit and Save Results:
                     np.fromfile(image_path, dtype=np.uint8),
                     1,
                 )
-                self.getScaleInfo(only_check_winsize=False)
+                self.getScaleInfo(False)
                 if self.vis_mode > 0:
                     self.set_mode(self.vis_mode)
 
@@ -553,7 +561,7 @@ Exit and Save Results:
                     f"Img ID: {labeled_index}\nImg Path: {image_path}\nLabel Path: {self.label_path}\n"
                 )
 
-            self.getScaleInfo(only_check_winsize=True)
+            self.getScaleInfo(True)
             cv2.setMouseCallback(self.windows_name, self._draw_roi)
             self.render()
             key = cv2.waitKey(1)
