@@ -12,6 +12,13 @@ from itertools import chain
 from utils import *
 
 
+class config_window:
+    
+    def show(self,main_window):
+        cv2.namedWindow(main_window.config_name, cv2.WINDOW_NORMAL)
+        cv2.createTrackbar("mode", main_window.config_name, main_window.vis_mode, 10, main_window.set_mode)
+        
+        
 class CLabeled:
     img_format = [".jpg", ".png", ".webp",".bmp",".jpeg"]
     _help = f"""
@@ -23,7 +30,7 @@ Opening the Software
     Method 1: Drag and drop a folder or file onto label.exe to open it.
     Method 2: Use cmd to open with the command label.exe "path".
 
-Display Help:
+Display Help and Config:
 
     Press the H key on the keyboard.
 
@@ -116,6 +123,7 @@ Exit and Save Results:
         self.height = None
 
         self.windows_name = "image"
+        self.config_name = "config"
         self.mouse_position = (0, 0)
         self.show_label = True
 
@@ -523,8 +531,9 @@ Exit and Save Results:
 
         print("Total Num: ", self.total_image_number)
         cv2.namedWindow(self.windows_name, cv2.WINDOW_NORMAL)
-
-        cv2.createTrackbar("mode", self.windows_name, self.vis_mode, 10, self.set_mode)
+        
+        config = config_window()
+        
         visited_image = set()
         labeled_index, labeled_box = self.current_label_index, 0
         save_info = False
@@ -601,6 +610,7 @@ Exit and Save Results:
                 self.current_label_index = min(
                     self.current_label_index, self.total_image_number - 1
                 )
+                init = True
 
 
             elif key == ord("n") or key == ord("N"):
@@ -608,6 +618,8 @@ Exit and Save Results:
                 
             elif key == ord("h") or key == ord("H"):
                 print(CLabeled._help)
+                config.show(self)
+                
                 
             elif key == 27:  # exit
                 self.write_label_file(self.label_path)
