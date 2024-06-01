@@ -26,3 +26,10 @@ LabelDet 是一款图像标注工具，旨在简化和加速使用 YOLO 格式�
 - **模式 4**：降低对比度
 - **模式 5**：抗曝光处理
 - **模式 6**：幂律变换
+
+
+## 打包命令
+
+```bash
+pyinstaller -F --version-file version.txt detect_label.py
+```

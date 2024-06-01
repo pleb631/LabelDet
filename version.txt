@@ -33,10 +33,7 @@ VSVersionInfo(
 	# 文件说明
         [StringStruct(u'FileDescription', u'labeling for object detection'),
         StringStruct(u'FileVersion', u'0, 1, 4, 0'),
-	# 内部名称
-    #    StringStruct(u'InternalName', u'MaiGa entertainment chain'),
-	# 版权
-    #    StringStruct(u'LegalCopyright', u'Copyright (C) 2021 MaiGa entertainment chain'),
+
 	# 原始文件名
         StringStruct(u'OriginalFilename', u'detect_label.exe'),
 	# 产品名称

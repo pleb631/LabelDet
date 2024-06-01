@@ -20,7 +20,6 @@ LabelDet is an image annotation tool designed to simplify and accelerate the ima
 - **Visual Modes**: Provides various image enhancement modes for better target recognition and annotation.
 - **Progress Archiving**: Can archive progress, facilitating the ability to close and resume progress at any time.
 
-
 The tool offers multiple visual modes to assist with annotation, selectable via the `mode` slider:
 
 - **Mode 1**: Histogram equalization
@@ -28,3 +27,9 @@ The tool offers multiple visual modes to assist with annotation, selectable via 
 - **Mode 4**: Decrease contrast
 - **Mode 5**: Anti-exposure processing
 - **Mode 6**: Power law transformation
+
+## Packing command
+
+```bash
+pyinstaller -F --version-file version.txt detect_label.py
+```
