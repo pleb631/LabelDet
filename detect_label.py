@@ -13,9 +13,13 @@ from utils import *
 
 
 class config_window:
-    
+
     def show(self,main_window):
+        if not cv2.getWindowProperty(main_window.config_name, cv2.WND_PROP_VISIBLE) < 1:
+            return 0
         cv2.namedWindow(main_window.config_name, cv2.WINDOW_NORMAL)
+        
+        cv2.resizeWindow(main_window.config_name, 320, 320)
         cv2.createTrackbar("mode", main_window.config_name, main_window.vis_mode, 10, main_window.set_mode)
         cv2.createTrackbar("thickness", main_window.config_name, main_window.thickness, 5, main_window.set_thickness)
         cv2.createTrackbar("scale", main_window.config_name, main_window.imgscale_mode, 1, main_window.set_imgscale_mode)
@@ -447,6 +451,9 @@ Exit and Save Results:
     def getScaleInfo(self,only_check_winsize=False):
         
         *_, win_width, win_height = cv2.getWindowImageRect(self.windows_name)
+        
+        if win_width<=0 or win_height<0:
+            return 0 
         if only_check_winsize and not self.win_info is None:
             if self.win_info[:2]==(win_width, win_height):
                 return 0
@@ -514,6 +521,7 @@ Exit and Save Results:
 
         print("Total Num: ", self.total_image_number)
         cv2.namedWindow(self.windows_name, cv2.WINDOW_NORMAL)
+        cv2.resizeWindow(self.windows_name, 640, 480)
         
         config = config_window()
         

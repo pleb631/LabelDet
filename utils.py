@@ -43,6 +43,7 @@ def plt_bbox(
     box,
     line_thickness=None,
     label_format="{id}",
+    cls=None,
     txt_color=(255, 255, 255),
     box_color=[255, 0, 0],
 ):
@@ -61,7 +62,8 @@ def plt_bbox(
         sf = tl / 3  # font scale
 
         id = int(box[4])
-        label = label_format.format(id=id)
+        clss = cls[id] if not cls is None else id
+        label = label_format.format(id=id,cls=clss)
 
         w, h = cv2.getTextSize(label, 0, fontScale=sf, thickness=tf)[0]
         outside = p1[1] - h >= 3
