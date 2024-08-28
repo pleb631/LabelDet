@@ -16,9 +16,13 @@ class config_window:
     
     def show(self,main_window):
         cv2.namedWindow(main_window.config_name, cv2.WINDOW_NORMAL)
-        cv2.createTrackbar("mode", main_window.config_name, main_window.vis_mode, 10, main_window.set_mode)
+        cv2.createTrackbar("vis-mode", main_window.config_name, main_window.vis_mode, 10, main_window.set_mode)
         cv2.createTrackbar("thickness", main_window.config_name, main_window.thickness, 5, main_window.set_thickness)
-        cv2.createTrackbar("scale", main_window.config_name, main_window.imgscale_mode, 1, main_window.set_imgscale_mode)
+        cv2.createTrackbar("img-scale", main_window.config_name, main_window.imgscale_mode, 1, main_window.set_imgscale_mode)
+        
+        cv2.createTrackbar("show_num", main_window.config_name, main_window.show_boxnum, 1, main_window.set_show_boxnum)
+        
+        cv2.createTrackbar("cls-num", main_window.config_name, main_window.cls_num, main_window.cls_num, main_window.set_class_num)
         
 class CLabeled:
     img_format = [".jpg", ".png", ".webp",".bmp",".jpeg"]
@@ -103,7 +107,7 @@ Exit and Save Results:
         self.total_image_number = 0
         self._compute_total_image_number()
 
-        self.checkpoint_path = os.path.join(self.image_folder, f"checkpoint")
+        self.checkpoint_path = os.path.join(self.image_folder, "checkpoint")
 
         self.current_label_index = 0
         if os.path.exists(self.checkpoint_path):
@@ -133,7 +137,10 @@ Exit and Save Results:
         self.vis_mode = 0
         self.thickness = 2
         self.imgscale_mode = 0
+        self.show_boxnum = 1
         self.mouse_event=None
+        
+        self.copy_box = None
 
     def _encode_image(self, image):
         """
@@ -407,6 +414,11 @@ Exit and Save Results:
         self.imgscale_mode = value
         self.getScaleInfo(False)
         
+    def set_show_boxnum(self,value):
+        self.show_boxnum = value
+        
+    def set_class_num(self,value):
+        self.cls_num = value
         
     def set_mode(self, value):
         if self.image is not None:
@@ -492,7 +504,7 @@ Exit and Save Results:
                     color = compute_color_for_labels(self.cur_class)
                     cv2.rectangle(image, (self.ix, self.iy), (x, y), color, self.thickness)
                 
-                elif event == cv2.EVENT_MOUSEMOVE:
+                else:
                     cv2.line(
                         image,
                         (x, top),
@@ -503,7 +515,8 @@ Exit and Save Results:
                     )
                     cv2.line(image, (left, y), (win_width-right, y), (255, 0, 0), self.thickness, 8)
              
-            
+                    if self.show_boxnum==1:
+                        cv2.putText(image, f"{len(self.boxes)}", (min(x+10,win_width),max(0,y-10)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
                     
         if self.show_label:
             self._draw_box_on_image(image,left,top,new_unpad)
@@ -571,6 +584,14 @@ Exit and Save Results:
                 
             elif key == ord("e") or key == ord("E"):
                 self.change_box_category(1)
+
+            elif key == ord("c") or key == ord("C"):
+                boxes, classes = self.boxes.copy(), self.classes.copy()
+                self.copy_box = [boxes, classes]
+
+            elif key == ord("v") or key == ord("V"):
+                boxes, classes = self.copy_box
+                self.boxes, self.classes = boxes.copy(), classes.copy()
                 
             elif key == ord("a") or key == ord("A"):  # backward
                 self._backward()
@@ -612,7 +633,7 @@ def main():
     if len(sys.argv) > 1:
         image_folder = sys.argv[1]
     else:
-
+        #image_folder = r'E:\project\data'
         print(CLabeled._help)
         input("Press Enter to exit...")
         return
@@ -620,7 +641,7 @@ def main():
     if not os.path.exists(image_folder):
         raise ValueError(f"{colorstr('red', 'bold', 'ValueError:')} {image_folder} does not exists! please check it !")
 
-    category_num = 14
+    category_num = 4
     args = easydict.EasyDict(
         {
             "image_folder": image_folder,
