@@ -35,7 +35,7 @@ VSVersionInfo(
         StringStruct(u'FileVersion', u'0, 2, 1, 0'),
 
 	# 原始文件名
-        StringStruct(u'OriginalFilename', u'detect_label.exe'),
+        StringStruct(u'OriginalFilename', u'detect_label-v0.2.1.0.exe'),
 	# 产品名称
         StringStruct(u'ProductName', u'LabelDet'),
 	# 产品版本号
