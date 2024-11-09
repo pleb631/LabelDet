@@ -523,15 +523,19 @@ Exit and Save Results:
                         8,
                     )
                     cv2.line(image, (left, y), (win_width-right, y), (255, 0, 0), self.thickness, 8)
-             
+                    
+                    
+            if self.show_boxnum==1:
+                cv2.putText(image, f"{len(self.boxes)}", (min(x+10,win_width),max(0,y-10)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                
+                
         if not self.mouse_event is None or self.reload:
             self.mouse_event = None
                
             if self.show_label:
                 self._draw_box_on_image(image,left,top,new_unpad)
             
-            if self.show_boxnum==1:
-                cv2.putText(image, f"{len(self.boxes)}", (min(x+10,win_width),max(0,y-10)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+
                 
             cv2.imshow(self.windows_name, self._encode_image(image))
             self.reload=False   
