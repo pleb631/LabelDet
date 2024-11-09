@@ -7,7 +7,7 @@ import numpy as np
 import easydict
 import sys
 from itertools import chain
-
+import time
 
 from utils import *
 
@@ -138,6 +138,8 @@ Exit and Save Results:
         self.thickness = 2
         self.imgscale_mode = 0
         self.mouse_event=None
+        
+        self.reload=True
 
     def _encode_image(self, image):
         """
@@ -510,12 +512,14 @@ Exit and Save Results:
                     )
                     cv2.line(image, (left, y), (win_width-right, y), (255, 0, 0), self.thickness, 8)
              
+        if not self.mouse_event is None or self.reload:
+            self.mouse_event = None
+               
+            if self.show_label:
+                self._draw_box_on_image(image,left,top,new_unpad)
             
-                    
-        if self.show_label:
-            self._draw_box_on_image(image,left,top,new_unpad)
-        
-        cv2.imshow(self.windows_name, self._encode_image(image))
+            cv2.imshow(self.windows_name, self._encode_image(image))
+            self.reload=False
             
     def run(self):
 
@@ -529,6 +533,7 @@ Exit and Save Results:
         labeled_index, labeled_box = self.current_label_index, 0
         save_info = False
         init = True
+        last_ms=0
         while True:
             if self.current_label_index != labeled_index or save_info or init:
                 if save_info:
@@ -558,6 +563,7 @@ Exit and Save Results:
                     np.fromfile(image_path, dtype=np.uint8),
                     1,
                 )
+                self.reload=True
                 self.getScaleInfo(False)
                 if self.vis_mode > 0:
                     self.set_mode(self.vis_mode)
@@ -572,7 +578,15 @@ Exit and Save Results:
             self.getScaleInfo(True)
             cv2.setMouseCallback(self.windows_name, self._draw_roi)
             self.render()
-            key = cv2.waitKey(1)
+            
+                        
+            
+            cur_ms = int(time.perf_counter() * 1000)
+            if cur_ms-last_ms<30:
+                t = max(30-(cur_ms-last_ms),1)
+                time.sleep(t/1000)
+            
+            key = cv2.waitKey(1)& 0xFF
 
             if key == ord("q") or key == ord("Q"):
                 self.change_box_category(-1)
